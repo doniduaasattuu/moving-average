@@ -28,12 +28,19 @@
       type="text/javascript"
       src="https://cdn.jsdelivr.net/npm/chart.js"
     ></script>
-
+    <link
+      rel="icon"
+      href="https://www.bsi.ac.id/ubsi/assets/img/logo_ubsi.png"
+      type="image/x-icon"
+    />
     <title>Moving Average</title>
   </head>
   <body>
     <div class="container py-4">
-      <h2>Moving average</h2>
+      <h2 class="mb-1 fw-semibold">Moving average</h2>
+      <p class="text-secondary">
+        Aplikasi data analis moving average kelompok 9 Mata Kuliah Statistika
+      </p>
       <!-- INPUT FORM -->
       <div class="form-group row mb-3">
         <label class="col-form-label col-xl-10 text-secondary"
@@ -87,7 +94,7 @@
       </div>
 
       <div id="calculate" class="row form-group py-4 d-none">
-        <div class="col">
+        <div class="col-4">
           <input
             id="interval"
             type="number"
@@ -96,7 +103,7 @@
           />
         </div>
 
-        <div class="col">
+        <div class="col-8">
           <button disabled id="button_calculate" class="btn btn-primary">
             <svg
               class="me-1 mb-1"
@@ -112,6 +119,26 @@
               />
             </svg>
             Calculate
+          </button>
+
+          <button id="button_clear" class="btn btn-danger">
+            <svg
+              class="me-1 mb-1"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-trash"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"
+              />
+              <path
+                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"
+              />
+            </svg>
+            Clear
           </button>
         </div>
       </div>
@@ -134,16 +161,14 @@
       const interval = document.getElementById("interval");
       const button_calculate = document.getElementById("button_calculate");
       const chart_container = document.getElementById("chart_container");
+      const button_clear = document.getElementById("button_clear");
+
       let table_data = document.getElementsByClassName("table_data");
-      let min_value = 1;
-      let datas = [12, 32, 43, 21, 43, 32, 12, 32, 33, 12, 23, 29];
-      let data = [];
-
       let th_label = document.getElementsByClassName("th_label");
-      let labels = [];
-      let label = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      let min_value = 1;
 
-      let forecasts = [32, 12, 32, 33, 15, 39, 43, 26, 30, 12, 13, 39];
+      let data = [];
+      let labels = [];
       let forecast = [];
 
       let numbering = 0;
@@ -223,12 +248,17 @@
 
             for (let j = 0; j < interval.value; j++) {
               forecast_sum += Number(data[i - j]);
-              console.info("i: " + i + " - " + "j: " + j);
+              // console.info(i + " - " + j + " = " + (i - j));
             }
             console.log(forecast_sum);
-            //(Number(data[i]) + Number(data[i - 1]) + Number(data[i - 2])) /
-            // Number(interval.value)
-            forecast.push(Math.floor(forecast_sum / interval.value));
+            console.log(
+              forecast_sum +
+                " / " +
+                interval.value +
+                " = " +
+                Math.ceil(forecast_sum / interval.value)
+            );
+            forecast.push(Math.ceil(forecast_sum / interval.value));
           }
         }
 
@@ -236,56 +266,91 @@
           forecast.unshift(null);
         }
 
-        console.info(forecast);
         chart_container.classList.remove("d-none");
-      };
+        console.info("Maks: " + Math.ceil(Math.max(...data) / 10) * 10);
+        console.info(data);
 
-      // TRENDS
-      var ctxt = document.getElementById("trends").getContext("2d");
-      var trends = new Chart(ctxt, {
-        type: "line",
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              data: data,
-              label: "Data",
-              borderColor: "rgb(62,149,205)",
-              backgroundColor: "rgb(62,149,205)",
-              fill: false,
-              tension: 0.3,
-            },
-            {
-              data: forecast,
-              label: "Forecast",
-              borderColor: "rgb(196,88,180)",
-              backgroundColor: "rgb(196,88,180)",
-              fill: false,
-              tension: 0.3,
-            },
-          ],
-        },
-        options: {
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              type: "linear",
-              position: "left",
-              stack: "demo",
-              title: {
-                display: true,
-                text: "value",
+        // TRENDS
+        var ctxt = document.getElementById("trends").getContext("2d");
+        var trends = new Chart(ctxt, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                data: data,
+                label: "Data",
+                borderColor: "rgb(62,149,205)",
+                backgroundColor: "rgb(62,149,205)",
+                fill: false,
+                tension: 0.3,
               },
-              ticks: {
-                stepSize: 5,
+              {
+                data: forecast,
+                label: "Forecast",
+                borderColor: "rgb(196,88,180)",
+                backgroundColor: "rgb(196,88,180)",
+                fill: false,
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                type: "linear",
+                position: "left",
+                stack: "demo",
+                title: {
+                  display: true,
+                  text: "value",
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: "bottom",
               },
             },
           },
-        },
-      });
-      trends.canvas.parentNode.style.height = "350px";
-      trends.options.plugins.legend.position = "bottom";
-      // TRENDS
+        });
+        trends.canvas.parentNode.style.height = "350px";
+        // TRENDS
+      };
+
+      function clearAllData() {
+        data = [];
+        labels = [];
+        forecast = [];
+        while (table_body.firstChild) {
+          table_body.removeChild(table_body.firstChild);
+        }
+        calculate.classList.add("d-none");
+        numbering = 0;
+
+        while (chart_container.firstChild) {
+          chart_container.removeChild(chart_container.firstChild);
+        }
+
+        let h4 = document.createElement("h4");
+        h4.setAttribute("class", "text-center text-secondary");
+        h4.textContent = "Moving Average";
+
+        let canvas = document.createElement("canvas");
+        canvas.setAttribute("id", "trends");
+        canvas.style.marginBottom = "30px";
+
+        chart_container.appendChild(h4);
+        chart_container.appendChild(canvas);
+
+        chart_container.classList.add("d-none");
+      }
+
+      button_clear.onclick = () => {
+        clearAllData();
+      };
     </script>
   </body>
 </html>
